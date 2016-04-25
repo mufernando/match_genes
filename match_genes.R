@@ -13,7 +13,8 @@ match_genes = function (all, interest, opt = 10^4, graph = F) {
         #Subset the data.frame all containing only genes in the same chromosome as the interest gene.
         data = subset(all, all[,2] == interest[i, 2])
         #Remove genes that were a match already.
-        data = subset(data, !(data[,1] %in% match[,2]))
+        data = subset(data, (!(data[,1] %in% match[,2])))
+        data = subset(data, (data[,5] != interest[i,5]))
         #Just in case the data.frame isn't ordered by position in the chromosome.
         data = data[order(data$md),]
         #Calculate distance betwen gene of interest median position and every gene availiable.
@@ -57,5 +58,7 @@ shuffle_match = function (all, interest, opt = 10^4, times = 100) {
     #Return results
     return (results)
 }
+
+match_genes(all, interest)
 
 shuffle_match(all, interest)
