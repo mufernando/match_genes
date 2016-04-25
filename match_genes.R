@@ -14,6 +14,7 @@ match_genes = function (all, interest, opt = 10^4, graph = F) {
         data = subset(all, all[,2] == interest[i, 2])
         #Remove genes that were a match already.
         data = subset(data, (!(data[,1] %in% match[,2])))
+        #Get only the genes that have different function from the interest gene. You can use this column as a filter and the algorithm will work the same.
         data = subset(data, (data[,5] != interest[i,5]))
         #Just in case the data.frame isn't ordered by position in the chromosome.
         data = data[order(data$md),]
