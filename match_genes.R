@@ -1,7 +1,7 @@
 all = read.csv ("all_genes.csv", header=T)
 interest = read.csv ("genes_of_interest.csv", header=T)
 
-#match_genes finds a "control" (different biological function than the interest gene) gene closest located to an optimal distance to a given list of interest genes.
+#match_genes finds a "control" gene (gene with different biological function than the interest gene) closest located to an optimal distance to a given list of interest genes.
 match_genes = function (all, interest, opt = 10^4, graph = F, list=F) {
     #Initialize the data.frame that is going to be returned.
     match = data.frame(matrix(ncol=3, nrow=0))
