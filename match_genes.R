@@ -1,7 +1,8 @@
 all = read.csv ("all_genes.csv", header=T)
 interest = read.csv ("genes_of_interest.csv", header=T)
 
-match_genes = function (all, interest, opt = 10^4, graph = F) {
+#match_genes finds a "control" (different biological function than the interest gene) gene closest located to an optimal distance to a given list of interest genes.
+match_genes = function (all, interest, opt = 10^4, graph = F, list=F) {
     #Initialize the data.frame that is going to be returned.
     match = data.frame(matrix(ncol=3, nrow=0))
     #The function is gonna use the median to calculate gene distances.
@@ -28,7 +29,7 @@ match_genes = function (all, interest, opt = 10^4, graph = F) {
     #Assign names to the columns of match.
     colnames(match) = c("interest_ID", "match_ID", "distance")
     #Checks if the parameter graph is True.
-    if (graph == T) {
+    if (graph) {
         #Starts a graphics device X.
         x11()
         #Plot the distance between genes in a boxplot.
@@ -40,10 +41,18 @@ match_genes = function (all, interest, opt = 10^4, graph = F) {
         #Closes the graphic device.
         dev.off()
     }
-    #Return the match data.frame and the median distance gene of interest/control gene
-    return (list(match, median(match$distance)))
+    #Checks what is going to be returned depending on the parameter list
+    if(list) {
+        #Returns a list with the match data.frame and the median match distance. It is used in the shuffle_match function
+        return (list(match, median(match$distance)))
+    #If the argument list is false, then only the data.frame match is going to be returned.
+    } else {
+        #Returns the match data.frame.
+        return(match)
+    }
 }
 
+#shuffle_match tests whether changing the order of the rows in the interest data.frame alter the outcome. This function was built because match_genes has not a smart algorithm. 
 shuffle_match = function (all, interest, opt = 10^4, times = 100) {
     #Creates an empty list.
     results = list()
@@ -52,7 +61,7 @@ shuffle_match = function (all, interest, opt = 10^4, times = 100) {
         #Shuffle the interest data.frame
         interest = interest[sample(nrow(interest)),]
         #Appends the results from match_genes to a pre-existing list called results
-        results = append(results, list(match_genes(all, interest, opt)))
+        results = append(results, list(match_genes(all, interest, opt, graph=F, T)))
     }
     #Gets only the one result which got the median distance closest to the optimal.
     results = results[[which.min(abs(sapply(results, function(x) { x[[2]] })-opt))]][[1]]
@@ -60,6 +69,14 @@ shuffle_match = function (all, interest, opt = 10^4, times = 100) {
     return (results)
 }
 
-match_genes(all, interest)
+###Examples of usage
+#match_genes function with both needed data.frames and default parameters.
+match_genes(all, interest, list = T)
+#Running shuffle_match to check whether the order in the interest data.frame alters the outcome. Tipically, doing the shuffle_match is the best way to go, because match_genes algorithm isn't very smart.
+r = shuffle_match(all, interest)
+#Check the outcome of shuffle_match
+r
+#Computes the median of the distances between control and interest gene.
+median(r$distance)
 
-shuffle_match(all, interest)
+
